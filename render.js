@@ -61,10 +61,16 @@ function create_raw(obj) {
         throw new Error("Could not parse hex!");
       return parseInt(byte, 16);
     }))};
-
-  case "c":
-    JSON.parse(`"${parsedStr}"`);
+  default:
+    throw new Error("Unknown encoding");
   }
+}
+
+function create_relative(obj) {
+  var size = parseInt(obj["size"]);
+  if (Number.isNaN(size))
+    size = undefined;
+  return {"type": "relative", "val": BigInt(obj["value"]), "size": size, "base": obj["base"]}; // Size defaults to NaN
 }
 
 function render(obj) {
@@ -73,6 +79,9 @@ function render(obj) {
   obj["data"].forEach(function (i) {
     switch (i["type"]) {
     case "bytes": i["val"].forEach(x => bytes.push(x)); break;
+    case "relative": {
+      i["val"] += BigInt(obj["bases"][i["base"]]);
+    } /* fallthrough */
     case "int": {
       var size = i["size"];
       if (size === undefined)

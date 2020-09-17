@@ -5,31 +5,19 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 <!--<script src="https://raw.githack.com/SortableJS/Sortable/master/Sortable.js"></script>-->
 <style>
-ul.drag {
-  list-style: none;
-  padding: 0;
-}
-
-li.drag {
-  background: #eee;
-  margin: 1px;
-  padding: 5px 10px;
-}
-
 .sortable-ghost {
   opacity: .6;
 }
 </style>
 
-<body>
+<body class="bg-dark" style="width:100%;height:100%">
   <br>
-  <div class="container">
-    <label>Big endian <input id="big-endian" type="checkbox"></input></label>&nbsp;&nbsp;&nbsp;&nbsp;
-    <label>Word size (bytes) <input type="number" id="word-size" required="true" value="8"></input></label>
+  <div class="container text-white bg-dark">
     <br><br>
+    <em>List entries are draggable!</em>
     <div class="row">
       <div class="col">
-        <ul id="payload" class="drag"></ul>
+        <ul id="payload" class="list-group"></ul>
       </div>
       <div class="col">
         <form onsubmit="event.preventDefault(); append_elem($(this));" id="new-elem">
@@ -41,6 +29,7 @@ li.drag {
           <ul class="nav nav-tabs" id="input-table">
             <li class="nav-item"><a href="#input-padding" class="nav-link" data-toggle="tab" name="padding">Padding</a></li>
             <li class="nav-item"><a href="#input-integer" class="nav-link" data-toggle="tab" name="integer">Integer</a></li>
+            <li class="nav-item"><a href="#input-relative" class="nav-link" data-toggle="tab" name="relative">Relative</a></li>
             <li class="nav-item"><a href="#input-raw" class="nav-link" data-toggle="tab" name="raw">Raw</a></li>
 <!--            <li class="nav-item"><a href="#input-str" class="nav-link" data-toggle="tab" name="shellcode">Shellcode</a></li>-->
           </ul>
@@ -49,27 +38,41 @@ li.drag {
             <div class="tab-pane" id="input-padding">
               <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Byte (hex)</label>
-                <div class="col-sm-10"><input pattern="[a-fA-F\d]{1,2}" class="form-control" value="41" name="byte"></input></div>
+                <div class="col-sm-10"><input pattern="[a-fA-F\d]{1,2}" class="form-control" value="41" name="byte" disabled="disabled"></input></div>
               </div>
               <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Size</label>
-                <div class="col-sm-10"><input type="number" class="form-control" placeholder="Number of bytes" name="size" min="1" required="true"></input></div>
+                <div class="col-sm-10"><input type="number" class="form-control" placeholder="Number of bytes" name="size" min="1" required="true" disabled="disabled"></input></div>
               </div>
             </div>
             <div class="tab-pane" id="input-integer">
               <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Integer</label>
-                <div class="col-sm-10"><input pattern="([\d]+|0x[a-fA-F\d]+)" class="form-control" placeholder="Decimal or 0xhexadecimal" name="value" required="true"></input></div>
+                <div class="col-sm-10"><input pattern="([\d]+|0x[a-fA-F\d]+)" class="form-control" placeholder="Decimal or 0xhexadecimal" name="value" required="true" disabled="disabled"></input></div>
               </div>
               <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Size</label>
-                <div class="col-sm-10"><input pattern="([\d]+|0x[a-fA-F\d]+)" class="form-control" placeholder="Leave empty to use word size" name="size"></input></div>
+                <div class="col-sm-10"><input pattern="([\d]+|0x[a-fA-F\d]+)" class="form-control" placeholder="Leave empty to use word size" name="size" disabled="disabled"></input></div>
+              </div>
+            </div>
+            <div class="tab-pane" id="input-relative">
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Integer</label>
+                <div class="col-sm-10"><input pattern="([\d]+|0x[a-fA-F\d]+)" class="form-control" placeholder="Decimal or 0xhexadecimal" name="value" required="true" disabled="disabled"></input></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Size</label>
+                <div class="col-sm-10"><input pattern="([\d]+|0x[a-fA-F\d]+)" class="form-control" placeholder="Leave empty to use word size" name="size" disabled="disabled"></input></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Base</label>
+                <div class="col-sm-10"><input class="form-control" placeholder="Name of base address" name="base" required="true" disabled="disabled"></input></div>
               </div>
             </div>
             <div class="tab-pane" id="input-raw">
               <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Text</label>
-                <div class="col-sm-10"><textarea class="form-control" placeholder="Put your text here" name="value" required="true"></textarea></div>
+                <div class="col-sm-10"><textarea class="form-control" placeholder="Put your text here" name="value" required="true" disabled="disabled"></textarea></div>
               </div>
               <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Encoding</label>
@@ -84,11 +87,40 @@ li.drag {
             </div>
           </div>
           <button class="btn btn-primary submit">Append</button>
-          <button class="btn btn-danger" onclick="$('#new-elem')[0].reset();">Reset</button>
+          <button class="btn btn-danger" onclick="$('#new-elem')[0].reset(); return false;">Reset</button>
         </form>
       </div>
     </div>
+    <label>Big endian <input id="big-endian" type="checkbox"></input></label>&nbsp;&nbsp;&nbsp;&nbsp;
+    <label>Word size (bytes) <input type="number" id="word-size" required="true" value="8"></input></label>
+    <table class="table-dark" style="width:100%">
+      <thead class="thead">
+        <tr>
+          <th>Base Name</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody id="bases">
+        <tr id="empty-base"><td><input name="name" style="width:100%" onchange="probe_textbox(this.parentElement.parentElement)"></input></td><td><input name="value" style="width:100%" onchange="probe_textbox(this.parentElement.parentElement)" pattern="([\d]+|0x[a-fA-F\d]+)"></input></td></tr>
+      </tbody>
+    </table>
+    <br><br>
     <script>
+      function probe_textbox(row) {
+        var $row = $(row);
+        var all_empty = true;
+        $row.find("input").each(function () { all_empty &= ($(this).val().length == 0); });
+        var is_last = $row.attr('id') == "empty-base";
+        if (all_empty && !is_last)
+          $row.remove();
+        else if (!all_empty && is_last) {
+          $tbody = $row.parent();
+          var $new_row = $row.clone()
+          $new_row.find("input").each(function() { $(this).val(''); });
+          $row.removeAttr('id');
+          $tbody.append($new_row);
+        }
+      }
       window.onbeforeunload = function(){
         return "Careful! You will lose the project here if you navigate away!";
       };
@@ -106,7 +138,7 @@ li.drag {
         target.find("li").each(function(idx) {
           arr.push($(this).data("smashing"));
         });
-        return render({"data": arr, "word": parseInt($("#word-size").val()), "be":$("#big-endian").is(":checked")});
+        return render({"data": arr, "word": parseInt($("#word-size").val()), "be":$("#big-endian").is(":checked"), "bases": getBases($("#bases"))});
       }
       function getFormData($form){
         var ret = {}
@@ -124,6 +156,16 @@ li.drag {
         ret["type"] = $form.find("a.nav-link.active").attr("name");
         return ret;
       }
+      function getBases($tbody) {
+        var ret = {};
+        $tbody.find("tr").each(function() {
+          // Skip extra table element
+          if ($(this).attr('id') !== undefined)
+            return;
+          ret[$(this).find("[name=name]").val()] = $(this).find("[name=value]").val();
+        });
+        return ret;
+      }
       function append_elem(elem) {
         var form_obj = getFormData(elem);
         console.log(JSON.stringify(form_obj));
@@ -134,6 +176,7 @@ li.drag {
         switch (type) {
         case "padding": smashing_data = create_padding(form_obj); break;
         case "integer": smashing_data = create_integer(form_obj); break;
+        case "relative": smashing_data = create_relative(form_obj); break;
         case "raw": smashing_data = create_raw(form_obj); break;
 
         default:
@@ -141,7 +184,7 @@ li.drag {
           return;
         }
 
-        var new_item = $("<li class='drag'></li>");
+        var new_item = $("<li class='list-group-item list-group-item-dark'></li>");
         new_item.text(form_obj["name"]);
         new_item.data("smashing", smashing_data);
 
