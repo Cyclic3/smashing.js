@@ -244,6 +244,14 @@
         <li>Use ropper or ropgadget or something to do it for you</li>
       </ol>
     </div>
+    <div>
+      <h5>User-provided format string<h5>
+      This is a rather fun one:
+      <ol>
+        <li>On a local machine, try <code>%n$p</code> for as many <code>n</code> as you care to, taking note of useful offsets (return pointers, stack canaries, buffer start, etc)</li>
+        <li>If the value you wish to write is small, you can use <code>%.y%z$nx</code> where <code>x</code> is the raw bytes of the pointer, <code>y</code> is the value in decimal, and <code>z</code> is the offset to the stored string <code>z</code>.
+        <li>If the value you wish to write is big, do the above with multiple passes, repairing messed up values as you go</li>
+      </ol>
   </div>
 </body>
 
