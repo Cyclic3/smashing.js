@@ -76,24 +76,25 @@ function create_relative(obj) {
   var size = parseInt(obj["size"]);
   if (Number.isNaN(size))
     size = undefined;
-  return {"type": "relative", "val": neg ? BigInt(val) : -BigInt(val), "size": size, "base": obj["base"]};
+  return {"type": "relative", "val": neg ? -BigInt(val) : BigInt(val), "size": size, "base": obj["base"]};
 }
 
 function render(obj) {
   bytes = [];
 
   obj["data"].forEach(function (i) {
+    var val = i["val"];
     switch (i["type"]) {
-    case "bytes": i["val"].forEach(x => bytes.push(x)); break;
+    case "bytes": val.forEach(x => bytes.push(x)); break;
     case "relative": {
-      i["val"] += BigInt(obj["bases"][i["base"]]);
+      val += BigInt(obj["bases"][i["base"]]);
     } /* fallthrough */
     case "int": {
       var size = i["size"];
       if (size === undefined)
         size = obj["word"];
       var tmp_arr = new Uint8Array(size); // default init'ed to 0
-      var i_val = i["val"];
+      var i_val = val;
 
       for (var i = 0; i_val != 0n && i < size; ++i, i_val /= 256n)
         tmp_arr[i] = Number(i_val % 256n);
