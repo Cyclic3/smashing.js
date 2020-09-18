@@ -82,6 +82,8 @@ function create_relative(obj) {
 function render(obj) {
   bytes = [];
 
+  console.log(obj);
+
   obj["data"].forEach(function (i) {
     var val = i["val"];
     switch (i["type"]) {
