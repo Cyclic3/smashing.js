@@ -28,7 +28,7 @@ function create_integer(obj) {
   var size = parseInt(obj["size"]);
   if (Number.isNaN(size))
     size = undefined;
-  return {"type": "int", "val": BigInt(obj["value"]), "size": size}; // Size defaults to NaN
+  return {"type": "int", "val": BigInt(obj["value"]), "size": size};
 }
 
 function _finish_string(str) {
@@ -67,10 +67,16 @@ function create_raw(obj) {
 }
 
 function create_relative(obj) {
+  var neg = false;
+  var val = obj["value"];
+  if (val[0] == '-') {
+    neg = true;
+    val = val.slice(1);
+  }
   var size = parseInt(obj["size"]);
   if (Number.isNaN(size))
     size = undefined;
-  return {"type": "relative", "val": BigInt(obj["value"]), "size": size, "base": obj["base"]}; // Size defaults to NaN
+  return {"type": "relative", "val": neg ? BigInt(val) : -BigInt(val), "size": size, "base": obj["base"]};
 }
 
 function render(obj) {
