@@ -38,6 +38,7 @@ function _finish_string(str) {
 function create_raw(obj) {
   var val = obj["value"];
   switch (obj["encoding"]) {
+  case "utf8": return _finish_string(val);
   case "utf8-null": return _finish_string(val + "\0");
   case "c":
     // We need to do this to get all escape sequences (JSON only supports a subset)
